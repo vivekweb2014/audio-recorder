@@ -3,8 +3,10 @@ package com.wirehall.audiorecorder.explorer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
-import android.support.annotation.NonNull;
-import android.support.v7.preference.PreferenceManager;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
+
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -217,6 +219,7 @@ public class FileUtils {
 
     public static String getRecordingStoragePath(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(MainActivity.KEY_PREF_RECORDING_STORAGE_PATH, FileListFragment.DEFAULT_STORAGE_PATH);
+        return prefs.getString(MainActivity.KEY_PREF_RECORDING_STORAGE_PATH,
+                context.getExternalFilesDir(null) + FileListFragment.DEFAULT_STORAGE_PATH);
     }
 }
