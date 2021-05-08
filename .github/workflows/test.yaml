@@ -1,0 +1,44 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  test:
+    runs-on: macos-latest
+    name: Run Tests on API-${{ matrix.api-level }}
+    strategy:
+      matrix:
+        api-level: [ 23, 25, 29 ]
+        target: [ default ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Cache Gradle Packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Run Instrumented Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          profile: Nexus 6
+          script: ./gradlew connectedCheck
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-coverage-report
+          path: app/build/reports/coverage/debug
+
+      - name: Codecov
+        uses: codecov/codecov-action@v1.5.0
